@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 시대 경량 문서화 양식 분석 보고서</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2d3248;
+    --text: #e0e0e6;
+    --text-dim: #8b8fa3;
+    --accent: #6c8aff;
+    --accent2: #a78bfa;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --cyan: #22d3ee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #0c1220 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2.4em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6c8aff, #a78bfa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    color: var(--text-dim);
+    font-size: 1.1em;
+    margin-bottom: 20px;
+  }
+  .hero .meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 0.85em;
+    color: var(--text-dim);
+  }
+  .hero .meta span {
+    background: var(--surface);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+  .toc h2 {
+    font-size: 1.2em;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+  }
+  .toc a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.92em;
+    padding: 4px 0;
+    display: block;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc a .num { color: var(--accent2); margin-right: 6px; }
+
+  section {
+    margin-bottom: 48px;
+  }
+  h2.section-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.section-title .badge {
+    font-size: 0.5em;
+    background: var(--accent);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  h3 {
+    font-size: 1.15em;
+    color: var(--accent2);
+    margin: 24px 0 12px;
+    font-weight: 600;
+  }
+  h4 {
+    font-size: 1em;
+    color: var(--cyan);
+    margin: 16px 0 8px;
+    font-weight: 600;
+  }
+  p { margin-bottom: 12px; color: var(--text); }
+  .dim { color: var(--text-dim); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card h4 {
+    margin-top: 0;
+    font-size: 1.05em;
+  }
+  .card .stars {
+    font-size: 0.82em;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+  .card .desc {
+    font-size: 0.9em;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .card .tag {
+    display: inline-block;
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border: 1px solid;
+  }
+  .tag-high { color: var(--green); border-color: var(--green); }
+  .tag-mid { color: var(--yellow); border-color: var(--yellow); }
+  .tag-new { color: var(--cyan); border-color: var(--cyan); }
+  .tag-mature { color: var(--accent2); border-color: var(--accent2); }
+  .tag-tool { color: var(--orange); border-color: var(--orange); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.9em;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    text-align: left;
+    padding: 12px 14px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:hover td { background: rgba(108, 138, 255, 0.05); }
+  .rank-1 { color: var(--yellow); font-weight: 700; }
+  .rank-2 { color: var(--text); font-weight: 600; }
+  .rank-3 { color: var(--text-dim); }
+
+  /* Callout */
+  .callout {
+    background: linear-gradient(135deg, rgba(108,138,255,0.1), rgba(167,139,250,0.1));
+    border-left: 4px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .callout.warn {
+    background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(248,113,113,0.1));
+    border-left-color: var(--yellow);
+  }
+  .callout.success {
+    background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(34,211,238,0.1));
+    border-left-color: var(--green);
+  }
+  .callout strong { color: var(--text); }
+  .callout p { margin-bottom: 4px; }
+
+  /* Code blocks */
+  .code-block {
+    background: #0d0f16;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 12px 0;
+    color: var(--text-dim);
+  }
+  .code-block .comment { color: #5c6370; }
+  .code-block .key { color: var(--accent); }
+  .code-block .val { color: var(--green); }
+  .code-block .section { color: var(--yellow); font-weight: 600; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 16px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .timeline-date {
+    font-size: 0.8em;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .timeline-content {
+    font-size: 0.9em;
+    color: var(--text-dim);
+  }
+
+  /* Comparison chart */
+  .bar-chart {
+    margin: 16px 0;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+  .bar-label {
+    width: 160px;
+    font-size: 0.85em;
+    color: var(--text-dim);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 24px;
+    background: var(--surface2);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 0.75em;
+    font-weight: 600;
+    color: #fff;
+    transition: width 0.8s ease;
+  }
+  .bar-fill.blue { background: linear-gradient(90deg, #4f6bff, #6c8aff); }
+  .bar-fill.purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .bar-fill.green { background: linear-gradient(90deg, #16a34a, #4ade80); }
+  .bar-fill.cyan { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+  .bar-fill.orange { background: linear-gradient(90deg, #ea580c, #fb923c); }
+  .bar-fill.yellow { background: linear-gradient(90deg, #ca8a04, #fbbf24); }
+
+  /* Quote */
+  blockquote {
+    border-left: 3px solid var(--accent2);
+    padding: 12px 20px;
+    margin: 16px 0;
+    background: rgba(167,139,250,0.05);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--text-dim);
+  }
+  blockquote cite {
+    display: block;
+    margin-top: 8px;
+    font-style: normal;
+    font-size: 0.85em;
+    color: var(--accent2);
+  }
+
+  /* Sources */
+  .sources {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .sources h4 { margin: 0 0 8px; font-size: 0.9em; color: var(--text-dim); }
+  .sources a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.82em;
+    display: block;
+    padding: 2px 0;
+    word-break: break-all;
+  }
+  .sources a:hover { text-decoration: underline; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 0.85em;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero { padding: 40px 20px 30px; }
+    .hero h1 { font-size: 1.6em; }
+    .container { padding: 24px 16px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .bar-label { width: 100px; font-size: 0.75em; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>AI 시대 경량 문서화 양식 분석 보고서</h1>
+  <p class="subtitle">GitHub Top Repos + Reddit 개발자 커뮤니티 + 최신 트렌드 종합 분석</p>
+  <div class="meta">
+    <span>2026.04.07 작성</span>
+    <span>분석 기간: 2025.10 ~ 2026.03</span>
+    <span>소스: GitHub / Reddit / 기술 블로그 / 학술 연구</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>목차</h2>
+  <div class="toc-grid">
+    <div>
+      <a href="#sec1"><span class="num">1.</span> Executive Summary</a>
+      <a href="#sec2"><span class="num">2.</span> GitHub 인기 양식 Top 8 비교</a>
+      <a href="#sec3"><span class="num">3.</span> 양식별 상세 분석</a>
+      <a href="#sec4"><span class="num">4.</span> AI 가독성 & 채택률 비교</a>
+    </div>
+    <div>
+      <a href="#sec5"><span class="num">5.</span> Reddit 커뮤니티 반응 (25.10~26.03)</a>
+      <a href="#sec6"><span class="num">6.</span> ETH Zurich 연구: 반론과 교훈</a>
+      <a href="#sec7"><span class="num">7.</span> 2026년 트렌드 타임라인</a>
+      <a href="#sec8"><span class="num">8.</span> 실무 권장 조합 & 결론</a>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<section id="sec1">
+  <h2 class="section-title">1. Executive Summary</h2>
+
+  <div class="callout">
+    <p><strong>핵심 결론:</strong> 2026년 현재, AI 코딩 시대의 문서화는 <strong>Markdown이 사실상 표준(de facto standard)</strong>이며, "Constitution &rarr; Spec &rarr; Plan &rarr; Tasks" 4단계 워크플로우가 업계 합의로 수렴 중이다. 그러나 ETH Zurich 연구는 "과도한 컨텍스트 파일은 오히려 역효과"라는 경고를 제시한다.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>가장 많은 Stars</h4>
+      <p style="font-size: 2em; font-weight: 800; color: var(--yellow);">85,760</p>
+      <p class="dim">GitHub Spec Kit (github/spec-kit)</p>
+    </div>
+    <div class="card">
+      <h4>가장 빠른 채택</h4>
+      <p style="font-size: 2em; font-weight: 800; color: var(--green);">60,000+</p>
+      <p class="dim">AGENTS.md (8개월 만에 60K repos)</p>
+    </div>
+    <div class="card">
+      <h4>커뮤니티 권장 길이</h4>
+      <p style="font-size: 2em; font-weight: 800; color: var(--cyan);">60줄 이하</p>
+      <p class="dim">CLAUDE.md (80줄 초과 시 AI가 무시 시작)</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 2: Top 8 Comparison -->
+<section id="sec2">
+  <h2 class="section-title">2. GitHub 인기 양식 Top 8 비교</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>순위</th>
+        <th>양식</th>
+        <th>대표 Repo Stars</th>
+        <th>AI 가독성</th>
+        <th>범용성</th>
+        <th>성숙도</th>
+        <th>핵심 용도</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="rank-1">1</td>
+        <td><strong>GitHub Spec Kit</strong></td>
+        <td style="color:var(--yellow)">85,760</td>
+        <td style="color:var(--green)">최상</td>
+        <td>높음</td>
+        <td style="color:var(--cyan)">신규/급성장</td>
+        <td>전체 개발 라이프사이클</td>
+      </tr>
+      <tr>
+        <td class="rank-1">2</td>
+        <td><strong>DESIGN.md</strong></td>
+        <td style="color:var(--yellow)">24,248</td>
+        <td style="color:var(--green)">최상</td>
+        <td>높음</td>
+        <td style="color:var(--cyan)">신규</td>
+        <td>UI 디자인 시스템</td>
+      </tr>
+      <tr>
+        <td class="rank-1">3</td>
+        <td><strong>AGENTS.md</strong></td>
+        <td style="color:var(--yellow)">19,823</td>
+        <td style="color:var(--green)">최상</td>
+        <td style="color:var(--green)">최상 (툴 중립)</td>
+        <td style="color:var(--cyan)">신규/급성장</td>
+        <td>에이전트 프로젝트 가이드</td>
+      </tr>
+      <tr>
+        <td class="rank-2">4</td>
+        <td><strong>ADR</strong></td>
+        <td>15,523</td>
+        <td style="color:var(--green)">높음</td>
+        <td style="color:var(--green)">최상</td>
+        <td style="color:var(--accent2)">매우 성숙</td>
+        <td>아키텍처 의사결정</td>
+      </tr>
+      <tr>
+        <td class="rank-2">5</td>
+        <td><strong>Backlog.md</strong></td>
+        <td>5,300</td>
+        <td>높음</td>
+        <td>높음</td>
+        <td style="color:var(--cyan)">신규</td>
+        <td>프로젝트 백로그</td>
+      </tr>
+      <tr>
+        <td class="rank-2">6</td>
+        <td><strong>CLAUDE.md</strong></td>
+        <td>3,434</td>
+        <td style="color:var(--green)">최상</td>
+        <td>Claude 전용</td>
+        <td style="color:var(--accent2)">성숙</td>
+        <td>에이전트 행동 지시</td>
+      </tr>
+      <tr>
+        <td class="rank-3">7</td>
+        <td><strong>Cursor Rules (.mdc)</strong></td>
+        <td>3,433</td>
+        <td>높음</td>
+        <td>Cursor 전용</td>
+        <td style="color:var(--accent2)">성숙</td>
+        <td>IDE 규칙</td>
+      </tr>
+      <tr>
+        <td class="rank-3">8</td>
+        <td><strong>RFC 템플릿</strong></td>
+        <td>-</td>
+        <td>중상</td>
+        <td style="color:var(--green)">최상</td>
+        <td style="color:var(--accent2)">매우 성숙</td>
+        <td>기술 제안/토론</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 3: Detailed Analysis -->
+<section id="sec3">
+  <h2 class="section-title">3. 양식별 상세 분석</h2>
+
+  <!-- Spec Kit -->
+  <h3>3.1 GitHub Spec Kit <span class="tag tag-new">85.7K Stars</span> <span class="tag tag-high">SDD 선두</span></h3>
+
+  <p>GitHub 공식 Spec-Driven Development 도구킷. "바이브 코딩" 대신 <strong>명세 &rarr; 계획 &rarr; 태스크 &rarr; 코드</strong> 파이프라인을 제공합니다.</p>
+
+  <div class="code-block">
+<span class="comment"># 프로젝트 구조</span>
+<span class="section">specs/</span>
+  <span class="key">constitution.md</span>    <span class="comment"># 프로젝트 핵심 원칙 (TDD 필수, CLI-first 등)</span>
+  feature-name/
+    <span class="key">spec.md</span>           <span class="comment"># 기능 명세 (유저 스토리 + Given/When/Then)</span>
+    <span class="key">plan.md</span>           <span class="comment"># 구현 계획 (기술 컨텍스트, Phase별 단계)</span>
+    <span class="key">tasks.md</span>          <span class="comment"># 태스크 목록 (체크박스, [P]로 병렬 표시)</span>
+    <span class="key">checklist.md</span>      <span class="comment"># 완료 체크리스트</span>
+  </div>
+
+  <h4>Spec 템플릿 핵심 구조</h4>
+  <div class="code-block">
+<span class="section"># Feature Specification: [FEATURE NAME]</span>
+
+<span class="key">## User Scenarios & Testing</span> <span class="comment">(mandatory)</span>
+<span class="key">### User Story 1 - [Title]</span> (Priority: P1)
+  - Why this priority
+  - Independent Test
+  - <span class="val">Acceptance Scenarios: Given / When / Then</span>
+
+<span class="key">### Edge Cases</span>
+
+<span class="key">## Requirements</span> <span class="comment">(mandatory)</span>
+<span class="key">### Functional Requirements</span> (FR-001, FR-002...)
+<span class="key">### Non-Functional Requirements</span>
+  </div>
+
+  <h4>CLI 명령어</h4>
+  <table>
+    <tr><th>명령어</th><th>기능</th></tr>
+    <tr><td><code>specify init &lt;PROJECT&gt;</code></td><td>프로젝트 초기화</td></tr>
+    <tr><td><code>/speckit.constitution</code></td><td>핵심 원칙 수립</td></tr>
+    <tr><td><code>/speckit.spec</code></td><td>기능 명세 작성</td></tr>
+    <tr><td><code>/speckit.plan</code></td><td>구현 계획 생성</td></tr>
+    <tr><td><code>/speckit.tasks</code></td><td>태스크 분해</td></tr>
+  </table>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://github.com/github/spec-kit">github.com/github/spec-kit</a>
+    <a href="https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/">GitHub Blog - Spec-Driven Development</a>
+    <a href="https://developer.microsoft.com/blog/spec-driven-development-spec-kit">Microsoft Developer Blog</a>
+  </div>
+
+  <!-- AGENTS.md -->
+  <h3>3.2 AGENTS.md <span class="tag tag-new">19.8K Stars</span> <span class="tag tag-high">범용 표준</span></h3>
+
+  <p>Linux Foundation 산하 Agentic AI Foundation에서 관리하는 <strong>AI 에이전트 범용 프로젝트 가이드</strong>. Google, OpenAI, Sourcegraph, Cursor, Factory가 합의하여 만든 오픈 표준입니다.</p>
+
+  <div class="code-block">
+<span class="section"># AGENTS.md</span>
+
+<span class="key">## Dev environment tips</span>
+- 빌드/패키지 관리 명령어
+- 환경 변수 설정
+
+<span class="key">## Testing instructions</span>
+- CI 위치, 테스트 실행법, lint 규칙
+
+<span class="key">## PR instructions</span>
+- 타이틀 포맷, 커밋 전 체크사항
+
+<span class="key">## Code conventions</span>
+- 네이밍, 파일 구조, 에러 처리 패턴
+  </div>
+
+  <div class="callout success">
+    <p><strong>채택 현황:</strong> 2025.8 출시 &rarr; 2026.2 기준 <strong>60,000+</strong> GitHub 리포지토리 채택. 에이전트 생성 버그 35-55% 감소, 세션 설정 시간 20-40분 &rarr; 2분 이하로 단축.</p>
+  </div>
+
+  <h4>AGENTS.md vs CLAUDE.md vs .cursorrules</h4>
+  <table>
+    <tr><th>항목</th><th>AGENTS.md</th><th>CLAUDE.md</th><th>.cursorrules</th></tr>
+    <tr><td>범용성</td><td style="color:var(--green)">모든 AI 도구</td><td>Claude 전용</td><td>Cursor 전용</td></tr>
+    <tr><td>관리 주체</td><td>Linux Foundation</td><td>Anthropic</td><td>Cursor Inc.</td></tr>
+    <tr><td>폴백 지원</td><td>-</td><td>AGENTS.md를 폴백으로 읽음</td><td>-</td></tr>
+    <tr><td>모노레포 지원</td><td style="color:var(--green)">하위 디렉토리별 배치</td><td>3-tier 구조</td><td>.cursor/rules/*.mdc</td></tr>
+    <tr><td>포맷</td><td>자유 Markdown</td><td>자유 Markdown</td><td>MDC (YAML frontmatter)</td></tr>
+  </table>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://agents.md/">agents.md (공식)</a>
+    <a href="https://developers.openai.com/codex/guides/agents-md">OpenAI Codex - AGENTS.md Guide</a>
+    <a href="https://serenitiesai.com/articles/cursorrules-vs-agents-md-vs-claude-md-comparison">Serenities AI - 3가지 비교</a>
+  </div>
+
+  <!-- CLAUDE.md -->
+  <h3>3.3 CLAUDE.md <span class="tag tag-mature">사실상 표준 (Claude 생태계)</span></h3>
+
+  <p>Anthropic Claude Code가 프로젝트 진입 시 자동으로 읽는 지시 파일. 커뮤니티가 가장 활발하게 모범 사례를 공유하는 양식입니다.</p>
+
+  <h4>권장 구조 (커뮤니티 합의, 2026.03)</h4>
+  <div class="code-block">
+<span class="section"># CLAUDE.md</span>
+
+<span class="key">## Project Overview</span>       <span class="comment"># 프로젝트 한줄 설명</span>
+<span class="key">## Architecture</span>            <span class="comment"># 주요 컴포넌트</span>
+<span class="key">## Tech Stack</span>              <span class="comment"># 기술 스택</span>
+<span class="key">## Commands</span>                <span class="comment"># 빌드/테스트/배포 명령어</span>
+<span class="key">## Coding Conventions</span>      <span class="comment"># 코딩 규칙</span>
+<span class="key">## Folder Structure</span>        <span class="comment"># 폴더 구조</span>
+<span class="key">## Important Rules</span>         <span class="comment"># 성능, 보안, 테스트 전략</span>
+<span class="key">## Workflow</span>                <span class="comment"># 개발 워크플로우</span>
+<span class="key">## Dependencies</span>            <span class="comment"># 의존성 정보</span>
+<span class="key">## Known Issues</span>            <span class="comment"># 알려진 이슈</span>
+  </div>
+
+  <h4>3-Tier 조직 구조</h4>
+  <table>
+    <tr><th>레벨</th><th>경로</th><th>용도</th><th>Git 추적</th></tr>
+    <tr><td>Global</td><td><code>~/.claude/CLAUDE.md</code></td><td>개인 선호도 (모든 프로젝트)</td><td>X</td></tr>
+    <tr><td>Project</td><td><code>.claude/CLAUDE.md</code></td><td>팀 공유 규칙</td><td style="color:var(--green)">O</td></tr>
+    <tr><td>Local</td><td><code>.claude/local.md</code></td><td>개인 설정</td><td>X (.gitignore)</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <p><strong>주의:</strong> 커뮤니티 보고에 따르면 <strong>80줄 초과 시 Claude가 일부 지시를 무시</strong>하기 시작합니다. HumanLayer는 60줄 이하 유지를 권장합니다. Anthropic 공식은 300줄 이하를 권장하되, 짧을수록 좋다고 안내합니다.</p>
+  </div>
+
+  <h4>프로덕션급 CLAUDE.md + Hooks (iamfakeguru/claude-md v3)</h4>
+  <div class="code-block">
+<span class="section">your-project/</span>
+  <span class="key">CLAUDE.md</span>                         <span class="comment"># 행동 지시</span>
+  .claude/
+    settings.json                    <span class="comment"># hook 설정</span>
+    hooks/
+      <span class="val">post-edit-verify.sh</span>            <span class="comment"># 편집 후 lint</span>
+      <span class="val">stop-verify.sh</span>                 <span class="comment"># 완료 전 type-check+lint+test</span>
+      <span class="val">truncation-check.sh</span>            <span class="comment"># 검색 결과 잘림 감지</span>
+      <span class="val">block-destructive.sh</span>           <span class="comment"># rm -rf, DROP TABLE 차단</span>
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://code.claude.com/docs/en/best-practices">Anthropic - Claude Code Best Practices</a>
+    <a href="https://www.humanlayer.dev/blog/writing-a-good-claude-md">HumanLayer - Writing a good CLAUDE.md</a>
+    <a href="https://github.com/iamfakeguru/claude-md">iamfakeguru/claude-md (v3)</a>
+    <a href="https://github.com/drona23/claude-token-efficient">drona23/claude-token-efficient</a>
+  </div>
+
+  <!-- DESIGN.md -->
+  <h3>3.4 DESIGN.md <span class="tag tag-new">24.2K Stars</span> <span class="tag tag-new">신규 포맷</span></h3>
+
+  <p>Google Stitch에서 시작된 <strong>AI 에이전트용 디자인 시스템 문서</strong>. AGENTS.md가 "어떻게 빌드"라면, DESIGN.md는 "어떻게 보여야 하는지"를 정의합니다.</p>
+
+  <div class="code-block">
+<span class="section"># DESIGN.md 구조</span>
+
+<span class="key">1. Visual Theme & Atmosphere</span>     <span class="comment"># 무드, 밀도, 디자인 철학</span>
+<span class="key">2. Color Palette & Roles</span>          <span class="comment"># 시맨틱 이름 + hex + 기능적 역할</span>
+<span class="key">3. Typography Rules</span>               <span class="comment"># 폰트 패밀리, 계층 테이블</span>
+<span class="key">4. Component Stylings</span>             <span class="comment"># 버튼, 카드, 입력 + 상태</span>
+<span class="key">5. Layout Principles</span>              <span class="comment"># 간격 스케일, 그리드, 여백</span>
+<span class="key">6. Depth & Elevation</span>              <span class="comment"># 그림자 시스템, 서피스 계층</span>
+<span class="key">7. Do's and Don'ts</span>                <span class="comment"># 디자인 가드레일</span>
+<span class="key">8. Responsive Behavior</span>            <span class="comment"># 브레이크포인트, 터치 타겟</span>
+<span class="key">9. Agent Prompt Guide</span>             <span class="comment"># 빠른 색상 참조, 즉시 사용 프롬프트</span>
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://github.com/VoltAgent/awesome-design-md">VoltAgent/awesome-design-md (58개 실제 사이트 디자인 시스템)</a>
+  </div>
+
+  <!-- ADR -->
+  <h3>3.5 ADR (Architecture Decision Records) <span class="tag tag-mature">15.5K Stars</span> <span class="tag tag-mature">가장 오래된 양식</span></h3>
+
+  <p>2011년 Michael Nygard가 제안한 아키텍처 의사결정 기록. ThoughtWorks Technology Radar에서 "Adopt" 추천. AI 시대에도 <strong>"Why"를 기록하는 유일한 양식</strong>으로 가치가 오히려 상승했습니다.</p>
+
+  <h4>Nygard 기본 템플릿</h4>
+  <div class="code-block">
+<span class="section"># [번호]. [제목]</span>
+Date: [날짜]
+
+<span class="key">## Status</span>
+<span class="val">[Proposed | Accepted | Deprecated | Superseded by ADR-XXX]</span>
+
+<span class="key">## Context</span>
+[결정이 필요한 맥락/문제 설명]
+
+<span class="key">## Decision</span>
+[결정 내용]
+
+<span class="key">## Consequences</span>
+[결정의 결과, 장단점]
+  </div>
+
+  <h4>MADR (Markdown Any Decision Records) - 더 구조화된 변형</h4>
+  <div class="code-block">
+<span class="section"># [제목]</span>
+
+<span class="key">## Context and Problem Statement</span>
+<span class="key">## Decision Drivers</span>
+<span class="key">## Considered Options</span>
+<span class="key">## Decision Outcome</span>
+  <span class="key">### Consequences</span> (Good / Bad / Neutral)
+<span class="key">## More Information</span>
+  </div>
+
+  <blockquote>
+    AI가 코드에서 What(무엇)과 How(어떻게)는 추론할 수 있지만, <strong>Why(왜 그렇게 결정했는가)</strong>는 추론할 수 없다. 이것이 ADR의 가치가 AI 시대에 오히려 높아진 이유다.
+    <cite>- "Just-in-Time Documentation" 패턴, 2024-2025 커뮤니티 합의</cite>
+  </blockquote>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://github.com/joelparkerhenderson/architecture-decision-record">joelparkerhenderson/architecture-decision-record</a>
+    <a href="https://www.thoughtworks.com/radar/techniques/lightweight-architecture-decision-records">ThoughtWorks - ADR</a>
+    <a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Michael Nygard 원문</a>
+  </div>
+
+  <!-- Other formats -->
+  <h3>3.6 기타 주목할 양식</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Backlog.md</h4>
+      <div class="stars">5,300 Stars</div>
+      <p class="desc">AI 에이전트와 인간이 프로젝트 백로그를 공유하는 마크다운 기반 도구. Git 생태계 네이티브.</p>
+      <span class="tag tag-new">신규</span>
+      <span class="tag tag-high">프로젝트 관리</span>
+    </div>
+    <div class="card">
+      <h4>program.md (Karpathy)</h4>
+      <div class="stars">61,000+ Stars (autoresearch)</div>
+      <p class="desc">전체 오케스트레이션을 Markdown 하나로. Python 코드를 편집하지 않고 program.md만 수정하여 AI 에이전트를 지시.</p>
+      <span class="tag tag-new">최신</span>
+      <span class="tag tag-high">자율 에이전트</span>
+    </div>
+    <div class="card">
+      <h4>Amazon Kiro Specs</h4>
+      <div class="stars">Kiro IDE 전용</div>
+      <p class="desc">.kiro/specs/ 아래 requirements.md &rarr; design.md &rarr; tasks.md 3단계 구조. Amazon의 6-Pager 철학을 AI IDE에 적용.</p>
+      <span class="tag tag-tool">Kiro 전용</span>
+    </div>
+    <div class="card">
+      <h4>AI-Optimized PRD</h4>
+      <div class="stars">ChatPRD 플랫폼</div>
+      <p class="desc">기계 파싱 가능한 구조화된 요구사항 문서. Copilot/Autopilot 모드별 최적화. Devin이 명확한 PRD로 67% PR 병합률 달성.</p>
+      <span class="tag tag-new">급성장</span>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: AI Readability Chart -->
+<section id="sec4">
+  <h2 class="section-title">4. AI 가독성 & 채택률 비교</h2>
+
+  <h3>GitHub Stars 기준 채택률</h3>
+  <div class="bar-chart">
+    <div class="bar-row">
+      <span class="bar-label">GitHub Spec Kit</span>
+      <div class="bar-track">
+        <div class="bar-fill blue" style="width:100%">85,760</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">DESIGN.md</span>
+      <div class="bar-track">
+        <div class="bar-fill purple" style="width:28%">24,248</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">AGENTS.md</span>
+      <div class="bar-track">
+        <div class="bar-fill green" style="width:23%">19,823</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">ADR</span>
+      <div class="bar-track">
+        <div class="bar-fill cyan" style="width:18%">15,523</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">Backlog.md</span>
+      <div class="bar-track">
+        <div class="bar-fill orange" style="width:6%">5,300</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">CLAUDE.md (템플릿)</span>
+      <div class="bar-track">
+        <div class="bar-fill yellow" style="width:4%">3,434</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>AI 도구별 네이티브 지원 현황</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>AI 도구</th>
+        <th>설정 파일</th>
+        <th>AGENTS.md 지원</th>
+        <th>Spec Kit 호환</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Claude Code</td><td>CLAUDE.md</td><td style="color:var(--green)">폴백으로 읽음</td><td style="color:var(--green)">O</td></tr>
+      <tr><td>GitHub Copilot</td><td>copilot-instructions.md</td><td style="color:var(--green)">O</td><td style="color:var(--green)">O (공식)</td></tr>
+      <tr><td>OpenAI Codex</td><td>AGENTS.md (공식)</td><td style="color:var(--green)">O (주도)</td><td style="color:var(--green)">O</td></tr>
+      <tr><td>Cursor</td><td>.cursor/rules/*.mdc</td><td style="color:var(--green)">O</td><td style="color:var(--yellow)">부분</td></tr>
+      <tr><td>Google Gemini CLI</td><td>GEMINI.md</td><td style="color:var(--green)">O</td><td style="color:var(--green)">O</td></tr>
+      <tr><td>Windsurf</td><td>.windsurf/rules/</td><td style="color:var(--green)">O</td><td style="color:var(--yellow)">부분</td></tr>
+      <tr><td>Amazon Kiro</td><td>.kiro/specs/</td><td style="color:var(--yellow)">부분</td><td style="color:var(--yellow)">자체 포맷</td></tr>
+      <tr><td>Aider</td><td>.aider.conf.yml</td><td style="color:var(--green)">O</td><td style="color:var(--yellow)">부분</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 5: Reddit Community -->
+<section id="sec5">
+  <h2 class="section-title">5. Reddit 커뮤니티 반응 <span class="badge">2025.10 ~ 2026.03</span></h2>
+
+  <div class="callout warn">
+    <p><strong>참고:</strong> Reddit.com은 Anthropic 크롤러를 차단하여 직접 접근이 불가했습니다. Reddit 집계/분석 사이트(MorphLLM, AI Tool Discovery 등), 블로그, GitHub를 통해 간접 수집했습니다.</p>
+  </div>
+
+  <h3>r/ClaudeAI (주간 4,200+ 기여자)</h3>
+  <div class="card">
+    <h4>CLAUDE.md 관련 핵심 합의</h4>
+    <ul style="color:var(--text-dim); padding-left:20px; font-size:0.92em;">
+      <li><strong>"200줄 이하, 가능하면 60줄 이하"</strong> - 80줄 초과 시 Claude가 일부 지시를 무시한다는 다수 보고</li>
+      <li><strong>"코드 스타일은 린터에게, 결정론적 작업은 Hooks에"</strong> - CLAUDE.md에 스타일 가이드를 넣지 말라는 의견 우세</li>
+      <li><strong>"실수 발견 시 CLAUDE.md에 추가하라"</strong> (Boris Cherny 황금률) - 반복적 실수를 방지하는 진화적 접근</li>
+      <li><strong>"/init 자동 생성은 대부분 쓸모없다"</strong> - 직접 작성해야 효과적이라는 의견</li>
+    </ul>
+  </div>
+
+  <h3>r/cursor + r/ChatGPTCoding</h3>
+  <div class="card">
+    <h4>Spec-Driven Development 반응</h4>
+    <ul style="color:var(--text-dim); padding-left:20px; font-size:0.92em;">
+      <li><strong>"바이브 코딩의 3개월 벽"</strong> - 바이브 코딩으로 시작한 프로젝트가 3개월 후 유지보수 불가능해지는 현상 다수 보고</li>
+      <li><strong>"spec &rarr; plan &rarr; tasks 워크플로우가 해답"</strong> - GitHub Spec Kit 도입 후 코드 품질 향상 보고 증가</li>
+      <li><strong>"AGENTS.md vs .cursorrules 통일해야"</strong> - 도구별 설정 파일 파편화에 대한 불만</li>
+    </ul>
+  </div>
+
+  <h3>r/ExperiencedDevs + r/programming</h3>
+  <div class="card">
+    <h4>경력 개발자 관점</h4>
+    <ul style="color:var(--text-dim); padding-left:20px; font-size:0.92em;">
+      <li><strong>"ADR은 죽지 않았다"</strong> - AI가 코드에서 What/How를 추론할 수 있지만 Why는 불가능. ADR의 가치 재확인</li>
+      <li><strong>"Context Engineering이 핵심 역량"</strong> - 프롬프트 엔지니어링에서 컨텍스트 엔지니어링으로 패러다임 전환</li>
+      <li><strong>"문서가 많다고 좋은 게 아니다"</strong> - ETH Zurich 연구 인용, 과도한 컨텍스트 파일의 역효과 논의</li>
+      <li><strong>"토큰 세금을 고려해야"</strong> - 규칙이 컨텍스트 윈도우 25%를 차지할 수 있다는 경고</li>
+    </ul>
+  </div>
+
+  <h3>r/vibecoding (신규 서브레딧)</h3>
+  <div class="card">
+    <h4>바이브 코딩 커뮤니티의 문서화 인식 변화</h4>
+    <ul style="color:var(--text-dim); padding-left:20px; font-size:0.92em;">
+      <li>초기: "문서 없이 프롬프트만으로 충분" &rarr; 현재: <strong>"최소한의 spec.md는 필수"</strong></li>
+      <li>Karpathy의 "에이전틱 엔지니어링" 선언 이후 문서화 중요성 인식 급증</li>
+      <li><strong>"마크다운에서 디테일을 다듬어라, 코드에서 하지 말고"</strong> (Teresa Torres 인용 빈번)</li>
+    </ul>
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://www.morphllm.com/claude-code-reddit">MorphLLM - Claude Code Reddit 분석</a>
+    <a href="https://www.aitooldiscovery.com/guides/claude-code-reddit">AI Tool Discovery - Claude Code Reddit</a>
+    <a href="https://www.aitooldiscovery.com/guides/cursor-reddit">AI Tool Discovery - Cursor Reddit</a>
+  </div>
+</section>
+
+<!-- Section 6: ETH Zurich -->
+<section id="sec6">
+  <h2 class="section-title">6. ETH Zurich 연구: 반론과 교훈</h2>
+
+  <div class="callout warn">
+    <p><strong>"Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"</strong><br>
+    ETH Zurich, 2026.02.12 | 138개 인스턴스, 12개 Python 리포, 4개 AI 에이전트 테스트</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>시나리오</th>
+        <th>성공률 변화</th>
+        <th>추론 비용 변화</th>
+        <th>평가</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>컨텍스트 파일 없음 (baseline)</td>
+        <td>-</td>
+        <td>-</td>
+        <td>기준</td>
+      </tr>
+      <tr>
+        <td style="color:var(--red)">LLM이 자동 생성한 파일</td>
+        <td style="color:var(--red)">-3% 하락</td>
+        <td style="color:var(--red)">+20% 증가</td>
+        <td style="color:var(--red)">오히려 해로움</td>
+      </tr>
+      <tr>
+        <td style="color:var(--yellow)">사람이 작성한 파일</td>
+        <td style="color:var(--yellow)">+4% 증가</td>
+        <td style="color:var(--yellow)">+19% 증가</td>
+        <td style="color:var(--yellow)">미미한 개선</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Addy Osmani의 해석 (2026.02.23)</h3>
+  <div class="card">
+    <ul style="color:var(--text-dim); padding-left:20px; font-size:0.92em;">
+      <li><code>/init</code> 자동 생성 <strong>사용 금지</strong> 권고</li>
+      <li>AGENTS.md에는 <strong>"에이전트가 코드에서 스스로 발견할 수 없는 정보만"</strong> 포함</li>
+      <li>AGENTS.md를 <strong>"아직 고치지 않은 코드 스멜의 목록"</strong>으로 취급할 것</li>
+      <li>문서의 유지보수를 위한 <strong>전담 서브에이전트</strong> 구축 제안</li>
+    </ul>
+  </div>
+
+  <div class="callout success">
+    <p><strong>실무 교훈:</strong> "덜 쓰되 정확하게"가 승리. 컨텍스트 파일에는 (1) 커스텀 빌드 명령, (2) 비표준 테스트 설정, (3) 프로젝트 고유 제약조건 등 <strong>AI가 코드에서 추론 불가능한 정보만</strong> 기록해야 한다.</p>
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <a href="https://www.infoq.com/news/2026/03/agents-context-file-value-review/">InfoQ - ETH Zurich 연구 해석</a>
+    <a href="https://www.marktechpost.com/2026/02/25/new-eth-zurich-study-proves-your-ai-coding-agents-are-failing-because-your-agents-md-files-are-too-detailed/">MarkTechPost - ETH Zurich Study</a>
+    <a href="https://addyosmani.com/blog/agents-md/">Addy Osmani - Stop Using /init</a>
+  </div>
+</section>
+
+<!-- Section 7: Timeline -->
+<section id="sec7">
+  <h2 class="section-title">7. 2025-2026 트렌드 타임라인</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">2025.07</div>
+      <div class="timeline-content"><strong>Amazon Kiro</strong> 프리뷰 출시. Spec &rarr; Design &rarr; Tasks 3단계 워크플로우 제안.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.08</div>
+      <div class="timeline-content"><strong>AGENTS.md</strong> 공식 출시. Linux Foundation Agentic AI Foundation이 관리. OpenAI, Google, Sourcegraph 참여.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.09.30</div>
+      <div class="timeline-content"><strong>GitHub Blog</strong>: "Markdown as a Programming Language" 게시. Spec-Kit으로 Go 앱 전체를 Markdown만으로 개발한 사례.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.10.15</div>
+      <div class="timeline-content"><strong>Martin Fowler 팀</strong>: Kiro vs Spec Kit vs Tessl 3개 SDD 도구 심층 비교 분석 게시.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.11.05</div>
+      <div class="timeline-content"><strong>ThoughtWorks Technology Radar</strong>: SDD를 "Assess" 링에 배치. "확장 불가능할 수 있다"는 경고와 함께.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.11</div>
+      <div class="timeline-content"><strong>Spotify Engineering</strong>: "Context Engineering for Background Coding Agents" 시리즈 게시. 프롬프트 엔지니어링 &rarr; 컨텍스트 엔지니어링 패러다임 전환 선언.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2025.12.18</div>
+      <div class="timeline-content"><strong>Addy Osmani</strong>: "My LLM Coding Workflow 2026" 게시. spec.md + plan.md + CLAUDE.md 기반 "15분 워터폴" 워크플로우 제안.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026.02.12</div>
+      <div class="timeline-content"><strong>ETH Zurich</strong>: "Evaluating AGENTS.md" 논문 발표. LLM 생성 컨텍스트 파일이 오히려 해롭다는 연구 결과로 업계 논쟁 촉발.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026.02.23</div>
+      <div class="timeline-content"><strong>Addy Osmani</strong>: "Stop Using /init" 게시. 자동 생성 컨텍스트 파일에 대한 강력한 반대 의견.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026.03</div>
+      <div class="timeline-content"><strong>Karpathy autoresearch</strong>: program.md 패턴으로 자율 연구 에이전트 공개. GitHub 61K+ Stars. "Markdown이 새로운 프로그래밍 언어"라는 담론 확산.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">2026.03.26</div>
+      <div class="timeline-content"><strong>Stack Overflow Blog</strong>: "Coding Guidelines for AI Agents (and People Too)" 게시. 올바른 예시 + 틀린 예시 모두 제공, Gold standard 파일 권고.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 8: Recommendations -->
+<section id="sec8">
+  <h2 class="section-title">8. 실무 권장 조합 & 결론</h2>
+
+  <h3>프로젝트 규모별 권장 양식 조합</h3>
+
+  <div class="card" style="border-left: 4px solid var(--green);">
+    <h4 style="color: var(--green);">개인 프로젝트 / 프로토타입</h4>
+    <div class="code-block">
+<span class="key">CLAUDE.md</span> (또는 AGENTS.md)   <span class="comment"># 30줄 이하, 빌드 명령 + 핵심 규칙만</span>
+<span class="key">spec.md</span>                       <span class="comment"># 1페이지, 무엇을 만들지 + 주요 제약</span>
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--accent);">
+    <h4 style="color: var(--accent);">스타트업 MVP / 중소규모 프로젝트</h4>
+    <div class="code-block">
+<span class="key">CLAUDE.md</span> (또는 AGENTS.md)   <span class="comment"># 60줄 이하, 아키텍처 + 규칙 + 명령어</span>
+<span class="key">specs/</span>
+  <span class="key">constitution.md</span>             <span class="comment"># 프로젝트 핵심 원칙</span>
+  feature-name/
+    <span class="key">spec.md</span>                   <span class="comment"># Given/When/Then 시나리오</span>
+    <span class="key">plan.md</span>                   <span class="comment"># Phase별 구현 계획</span>
+    <span class="key">tasks.md</span>                  <span class="comment"># 체크박스 태스크 목록</span>
+<span class="key">docs/adr/</span>                      <span class="comment"># 주요 기술 결정만 기록</span>
+    </div>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--accent2);">
+    <h4 style="color: var(--accent2);">팀 프로젝트 / 엔터프라이즈</h4>
+    <div class="code-block">
+<span class="key">AGENTS.md</span>                     <span class="comment"># 범용 (모든 AI 도구 호환)</span>
+<span class="key">CLAUDE.md</span>                     <span class="comment"># Claude 전용 추가 지시 (선택)</span>
+<span class="key">DESIGN.md</span>                     <span class="comment"># UI/디자인 시스템 (프론트엔드)</span>
+<span class="key">specs/</span>                         <span class="comment"># GitHub Spec Kit 전체 구조</span>
+<span class="key">docs/</span>
+  <span class="key">adr/</span>                        <span class="comment"># 아키텍처 결정 기록</span>
+  <span class="key">rfc/</span>                        <span class="comment"># 대규모 변경 제안</span>
+    </div>
+  </div>
+
+  <h3>핵심 원칙 5가지</h3>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>원칙</th><th>근거</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--accent); font-weight:700;">1</td>
+        <td><strong>덜 쓰되 정확하게</strong></td>
+        <td>ETH Zurich: 과도한 컨텍스트가 오히려 성능 저하. AI가 추론 불가능한 정보만 기록</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700;">2</td>
+        <td><strong>자동 생성 금지, 수동 작성</strong></td>
+        <td>Addy Osmani: /init 자동 생성 파일은 노이즈. 직접 작성해야 효과적</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700;">3</td>
+        <td><strong>Why를 기록하라</strong></td>
+        <td>AI는 코드에서 What/How를 추론하지만 Why는 불가. ADR로 결정 이유 기록</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700;">4</td>
+        <td><strong>린터 + Hooks로 강제, 문서로 안내</strong></td>
+        <td>코드 스타일은 린터에, 위험 방지는 Hooks에 위임. 문서는 가이드 역할만</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700;">5</td>
+        <td><strong>실수에서 진화시켜라</strong></td>
+        <td>Boris Cherny 황금률: AI가 실수할 때마다 CLAUDE.md에 규칙 추가. 문서는 살아있는 것</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>최종 결론</h3>
+
+  <div class="callout success">
+    <p><strong>2026년의 답:</strong> 아직 단일 표준은 없지만, <strong>GitHub Spec Kit의 4단계 구조</strong>(Constitution &rarr; Spec &rarr; Plan &rarr; Tasks)가 가장 높은 Stars와 공식 지원을 받으며 사실상 표준으로 수렴 중이다.</p>
+    <p style="margin-top:8px;">실무에서는 <strong>AGENTS.md</strong>(범용 에이전트 가이드) + <strong>Spec Kit 워크플로우</strong>(개발 라이프사이클) + <strong>ADR</strong>(의사결정 기록)의 조합이 가장 실용적이다.</p>
+    <p style="margin-top:8px;">단, ETH Zurich 연구가 경고하듯 <strong>"더 많이 쓸수록 더 좋다"는 오해는 금물</strong>. AI가 코드에서 추론할 수 없는 핵심 정보만 간결하게 기록하는 것이 최적의 전략이다.</p>
+  </div>
+
+</section>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>이 보고서는 GitHub 상위 Stars 프로젝트, Reddit 개발자 커뮤니티, 기술 블로그, 학술 연구를 종합 분석하여 작성되었습니다.</p>
+  <p style="margin-top:8px;">분석 기간: 2025.10 ~ 2026.03 | 작성일: 2026.04.07 | Generated with Claude Opus 4.6</p>
+</div>
+
+</body>
+</html>
