@@ -20,14 +20,15 @@
 
 ## 관측 스택
 
-> **[DECISION NEEDED]**
+팀 규모, 운영 역량, 예산에 따라 선택한다.
 
-| 스택 | 구성 | 특징 |
-|------|------|------|
-| **Grafana Stack** | Loki + Mimir + Tempo | OSS, 비용 효율적, 2024-2025 성장세 1위 |
-| **ELK** | Elasticsearch + Logstash + Kibana | 성숙, 강력한 검색 |
-| **Datadog** | SaaS 올인원 | 운영 부담 최소, 비용 높음 |
-| **Self-hosted vs SaaS** | | 팀 규모와 운영 역량에 따라 |
+| 스택 | 적합한 상황 |
+|------|------------|
+| **Grafana Stack** (Loki+Mimir+Tempo) | OSS, 비용 효율적. 운영 역량 있는 팀 |
+| **ELK** (Elasticsearch+Logstash+Kibana) | 강력한 로그 검색 필요. 성숙한 생태계 |
+| **Datadog / New Relic** (SaaS) | 운영 부담 최소화. 예산 여유 있을 시 |
+
+기준: 자체 호스팅 역량이 있으면 Grafana Stack, 없으면 SaaS.
 
 ## 구조화된 로깅
 

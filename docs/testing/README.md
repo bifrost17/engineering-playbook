@@ -25,19 +25,19 @@
 
 ## 테스트 비율 모델
 
-> **[DECISION NEEDED]** 프로젝트 특성에 따라 선택
+프로젝트 특성에 따라 선택한다. 결정 시 ADR로 기록할 것.
 
-| 모델 | 비율 | 적합한 상황 |
-|------|------|------------|
-| **Test Pyramid** | Unit 多 > Integration > E2E 少 | 라이브러리, 백엔드 API |
-| **Test Trophy** | Integration 중심 | 프론트엔드 앱 |
-| **Test Diamond** | Integration 가장 많음 | 마이크로서비스 |
+| 모델 | 적합한 상황 |
+|------|------------|
+| **Test Pyramid** (Unit 중심) | 라이브러리, 백엔드 API, 알고리즘 |
+| **Test Trophy** (Integration 중심) | 프론트엔드 앱, React/Vue |
+| **Test Diamond** (Integration 최다) | 마이크로서비스, API 중심 |
 
 2024-2026 트렌드: Integration 테스트 비중 확대가 공통.
 
 ## 테스트 작성 시점
 
-> **[DECISION NEEDED]** TDD 도입 여부
+팀 역량과 프로젝트 성격에 따라 선택한다.
 
 - **TDD:** 설계 품질 향상, 진입장벽 높음 (~15-20% 채택)
 - **Write-Tests-After:** 현실적, 진입장벽 낮음 (~60-70% 채택)

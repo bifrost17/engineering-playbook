@@ -36,35 +36,33 @@
 1. **Pre-commit hook:** 커밋 전 로컬에서 차단
 2. **CI:** Push 후 추가 스캔
 
-> **[DECISION NEEDED]** 도구 선택
+프로젝트 환경에 따라 선택한다.
 
-| 도구 | 특징 |
-|------|------|
-| **gitleaks** | 가장 인기, OSS, 활발한 커뮤니티 |
-| **truffleHog** | entropy 기반 탐지 |
-| **git-secrets** | AWS 제공, 경량 |
+| 도구 | 적합한 상황 |
+|------|------------|
+| **gitleaks** | 기본 추천. 가장 활발한 커뮤니티, OSS |
+| **truffleHog** | entropy 기반 탐지가 필요한 경우 |
+| **git-secrets** | AWS 환경, 경량 도구 선호 시 |
 
 ## 의존성 스캔 (SCA)
 
-> **[DECISION NEEDED]** 도구 선택
+소스 관리 플랫폼과 인프라 환경에 따라 선택한다.
 
-| 도구 | 특징 |
-|------|------|
-| **Dependabot** | GitHub 내장, 무료, 자동 PR |
-| **Snyk** | 넓은 언어 지원, 상용 |
-| **Trivy** | OSS, 컨테이너 + IaC 통합 |
-
-실용적 조합: Dependabot (기본) + Trivy (컨테이너/IaC 보완)
+| 도구 | 적합한 상황 |
+|------|------------|
+| **Dependabot** | GitHub 사용 시 기본. 무료, 자동 PR |
+| **Trivy** | 컨테이너/IaC 스캔 필요 시. Dependabot과 병행 추천 |
+| **Snyk** | 넓은 언어 지원 필요, 상용 예산 있을 시 |
 
 ## 정적 분석 (SAST)
 
-> **[DECISION NEEDED]** 도구 선택
+소스 관리 플랫폼과 커스텀 룰 필요도에 따라 선택한다.
 
-| 도구 | 특징 |
-|------|------|
-| **CodeQL** | GitHub 내장, 무료 |
-| **Semgrep** | OSS, 빠름, 커스텀 룰 유연 |
-| **SonarQube** | 넓은 언어, 상용 |
+| 도구 | 적합한 상황 |
+|------|------------|
+| **CodeQL** | GitHub 사용 시 기본. 무료 |
+| **Semgrep** | 커스텀 룰 유연, 빠름. OSS |
+| **SonarQube** | 넓은 언어 커버리지, 상용 환경 |
 
 ## 공급망 보안
 

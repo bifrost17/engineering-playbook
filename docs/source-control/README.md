@@ -4,10 +4,13 @@
 
 ## 브랜칭 전략
 
-> **[DECISION NEEDED]** GitHub Flow vs Trunk-Based Development
-> - 소규모 팀: GitHub Flow로 시작 권장
-> - CI/CD 성숙 후: Trunk-Based + Feature Flags 전환 고려
-> - DORA 연구: Trunk-Based가 고성과 팀의 특징으로 일관 보고
+프로젝트 범위에 따라 선택한다. 결정 시 ADR로 기록할 것.
+
+| 전략 | 적합한 상황 |
+|------|------------|
+| **GitHub Flow** | 소규모 팀, SaaS, 웹 서비스. 진입장벽 낮음 |
+| **Trunk-Based** | CI/CD 성숙, Feature Flag 인프라 보유. DORA 고성과 팀 특징 |
+| **Git Flow** | 명시적 릴리스 사이클, 모바일 앱, 패키지 배포 |
 
 ### GitHub Flow (기본 권장)
 

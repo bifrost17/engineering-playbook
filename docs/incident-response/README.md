@@ -97,7 +97,7 @@
 - **에스컬레이션 경로:** 1차 → 2차 → 매니저 → VP
 - **핸드오프:** 진행 중인 이슈 인계 문서화
 
-> **[DECISION NEEDED]** 인시던트 관리 도구: PagerDuty vs Opsgenie vs Grafana OnCall (OSS)
+기존 툴체인 연동과 예산에 따라 선택: PagerDuty (시장 1위) vs Opsgenie (Jira 연동) vs Grafana OnCall (OSS).
 
 ## 런북 (Runbook)
 
@@ -110,4 +110,4 @@
 5. **에스컬레이션** — 연락처
 6. **이전 인시던트** — 관련 과거 사례 링크
 
-> **[DECISION NEEDED]** 런북 저장 위치: Git repo vs Wiki (Notion/Confluence)
+팀 워크플로우에 따라 선택: Git repo (버전 관리 용이) vs Wiki (접근성 좋음).

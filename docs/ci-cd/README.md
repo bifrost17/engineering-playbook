@@ -13,15 +13,13 @@ Lint → Build → Unit Test → SAST/Secret Scan → Integration Test → Conta
 
 ## CI/CD 플랫폼
 
-> **[DECISION NEEDED]**
+프로젝트의 소스 관리 플랫폼과 인프라 환경에 따라 선택한다.
 
-| 플랫폼 | 시장점유율 (2024) | 강점 |
-|--------|------------------|------|
-| **GitHub Actions** | ~50% | GitHub 네이티브, 마켓플레이스 |
-| **GitLab CI** | ~30% | 자체 호스팅, 올인원 |
-| **Jenkins** | ~15% | 레거시, 유연성 |
-
-GitHub 사용 중이면 Actions가 자연스러운 선택.
+| 플랫폼 | 적합한 상황 |
+|--------|------------|
+| **GitHub Actions** | GitHub 사용 시 자연스러운 선택. 시장점유율 ~50% |
+| **GitLab CI** | 자체 호스팅 필요 시. 올인원 플랫폼 |
+| **Jenkins** | 레거시 환경, 극도의 유연성 필요 시 |
 
 ## GitOps 원칙
 
@@ -32,7 +30,7 @@ CNCF 정의 (2024 graduated):
 3. **자동 적용** (Automated Reconciliation)
 4. **지속적 검증** (Continuous Verification)
 
-> **[DECISION NEEDED]** GitOps 도구: ArgoCD (UI 풍부, 1위) vs FluxCD (경량)
+Kubernetes 환경에서 프로젝트 규모에 따라 선택: ArgoCD (UI 풍부, 1위) vs FluxCD (경량).
 
 ## 환경 전략
 
@@ -49,13 +47,13 @@ CNCF 정의 (2024 graduated):
 
 ## 배포 전략
 
-> **[DECISION NEEDED]**
+서비스 규모와 다운타임 허용치에 따라 선택한다.
 
-| 전략 | 특징 | 적합한 상황 |
-|------|------|------------|
-| **Rolling Update** | 점진적 교체, 간단 | 기본 선택 |
-| **Blue-Green** | 즉시 전환/롤백 | 다운타임 제로 필요 |
-| **Canary** | 일부 트래픽만 먼저 | 대규모 서비스, 위험 최소화 |
+| 전략 | 적합한 상황 |
+|------|------------|
+| **Rolling Update** | 기본 선택. 간단하고 대부분의 서비스에 충분 |
+| **Blue-Green** | 다운타임 제로 필요, 즉시 롤백 필요 |
+| **Canary** | 대규모 서비스, 점진적 검증으로 위험 최소화 |
 
 ## 시크릿 관리
 
@@ -63,4 +61,4 @@ CNCF 정의 (2024 graduated):
 - 외부 시크릿 저장소 사용 필수
 - CI/CD 변수는 마스킹 + 최소 권한 원칙
 
-> **[DECISION NEEDED]** 시크릿 저장소: Vault vs 클라우드 네이티브(AWS SM, GCP SM) vs SOPS+Age
+클라우드 종속성 허용 여부와 운영 역량에 따라 선택: Vault (범용) vs 클라우드 네이티브(AWS SM, GCP SM) vs SOPS+Age (경량).
