@@ -20,15 +20,14 @@
 
 ## 관측 스택
 
-팀 규모, 운영 역량, 예산에 따라 선택한다.
+팀 규모, 운영 역량, 예산에 따라 선택한다. **기본값: Grafana Cloud Free Tier** (소규모 무료, SaaS 편의성 + Grafana 생태계)
 
 | 스택 | 적합한 상황 |
 |------|------------|
-| **Grafana Stack** (Loki+Mimir+Tempo) | OSS, 비용 효율적. 운영 역량 있는 팀 |
-| **ELK** (Elasticsearch+Logstash+Kibana) | 강력한 로그 검색 필요. 성숙한 생태계 |
-| **Datadog / New Relic** (SaaS) | 운영 부담 최소화. 예산 여유 있을 시 |
-
-기준: 자체 호스팅 역량이 있으면 Grafana Stack, 없으면 SaaS.
+| **Grafana Cloud** (Free/Pro) | 소규모 기본 선택. 무료 티어로 시작, 확장 가능 |
+| **Grafana Stack** (Self-hosted) | 비용 효율적. 운영 역량 있는 팀 |
+| **ELK** | 강력한 로그 검색 필요. 성숙한 생태계 |
+| **Datadog / New Relic** | 운영 부담 최소화. 예산 여유 있을 시 |
 
 ## 구조화된 로깅
 

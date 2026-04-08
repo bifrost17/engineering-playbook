@@ -15,6 +15,8 @@ Lint → Build → Unit Test → SAST/Secret Scan → Integration Test → Conta
 
 프로젝트의 소스 관리 플랫폼과 인프라 환경에 따라 선택한다.
 
+**기본값: GitHub Actions** (GitHub 사용 시 자연스러운 선택)
+
 | 플랫폼 | 적합한 상황 |
 |--------|------------|
 | **GitHub Actions** | GitHub 사용 시 자연스러운 선택. 시장점유율 ~50% |
@@ -30,7 +32,7 @@ CNCF 정의 (2024 graduated):
 3. **자동 적용** (Automated Reconciliation)
 4. **지속적 검증** (Continuous Verification)
 
-Kubernetes 환경에서 프로젝트 규모에 따라 선택: ArgoCD (UI 풍부, 1위) vs FluxCD (경량).
+Kubernetes 환경에서 프로젝트 규모에 따라 선택. **기본값: K8s 미사용 시 불필요.** K8s 사용 시 ArgoCD (UI 풍부, 1위) vs FluxCD (경량).
 
 ## 환경 전략
 
@@ -49,6 +51,8 @@ Kubernetes 환경에서 프로젝트 규모에 따라 선택: ArgoCD (UI 풍부,
 
 서비스 규모와 다운타임 허용치에 따라 선택한다.
 
+**기본값: Rolling Update**
+
 | 전략 | 적합한 상황 |
 |------|------------|
 | **Rolling Update** | 기본 선택. 간단하고 대부분의 서비스에 충분 |
@@ -61,4 +65,4 @@ Kubernetes 환경에서 프로젝트 규모에 따라 선택: ArgoCD (UI 풍부,
 - 외부 시크릿 저장소 사용 필수
 - CI/CD 변수는 마스킹 + 최소 권한 원칙
 
-클라우드 종속성 허용 여부와 운영 역량에 따라 선택: Vault (범용) vs 클라우드 네이티브(AWS SM, GCP SM) vs SOPS+Age (경량).
+클라우드 종속성 허용 여부와 운영 역량에 따라 선택. **기본값: SOPS+Age** (경량, 인프라 불필요). 규모 커지면 Vault 또는 클라우드 네이티브(AWS SM, GCP SM)로 전환.

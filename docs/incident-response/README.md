@@ -97,7 +97,7 @@
 - **에스컬레이션 경로:** 1차 → 2차 → 매니저 → VP
 - **핸드오프:** 진행 중인 이슈 인계 문서화
 
-기존 툴체인 연동과 예산에 따라 선택: PagerDuty (시장 1위) vs Opsgenie (Jira 연동) vs Grafana OnCall (OSS).
+기존 툴체인 연동과 예산에 따라 선택. **기본값: Grafana OnCall** (OSS, 무료, Grafana 스택과 통합). 규모 커지면 PagerDuty 또는 Opsgenie 전환.
 
 ## 런북 (Runbook)
 
@@ -110,4 +110,4 @@
 5. **에스컬레이션** — 연락처
 6. **이전 인시던트** — 관련 과거 사례 링크
 
-팀 워크플로우에 따라 선택: Git repo (버전 관리 용이) vs Wiki (접근성 좋음).
+팀 워크플로우에 따라 선택. **기본값: Git repo** (코드와 함께 버전 관리, Documentation-as-Code 원칙 일관성).
